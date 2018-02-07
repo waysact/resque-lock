@@ -42,6 +42,14 @@ class LockTest < Test::Unit::TestCase
     assert_equal 1, Resque.redis.llen('queue:lock_test')
   end
 
+  def test_lock_arguments
+    client_arguments = :test
+    client_lock = Job.lock(client_arguments)
+    job_arguments = Resque.decode(Resque.encode(client_arguments))
+    job_lock = Job.lock(job_arguments)
+    assert_equal client_lock, job_lock
+  end
+
   def test_deadlock
     now = Time.now.to_i
 
